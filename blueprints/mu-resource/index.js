@@ -14,9 +14,9 @@ module.exports = {
   description: 'Generates an ember-data model and an ember application to edit it.',
 
   anonymousOptions: [
-    'name',
-    'attr:type',
-    'rel:kind:type~inverse'
+    'name$uri',
+    'attr:type$uri',
+    'rel:kind:type~inverse$uri'
   ],
 
   availableOptions: [
@@ -30,10 +30,11 @@ module.exports = {
   locals: function(options) {
 
     // Model
-
     var attrs = [];
     var needs = [];
     var properties = [];
+    var [ entityName, ...entityClassUri ] = options.entity.name.split("&");
+    entityClassUri = entityClassUri.join("&");
     var entityOptions = options.entity.options;
     var importStatements = [
       'import Model from \'ember-data/model\';',
@@ -42,11 +43,18 @@ module.exports = {
     var shouldImportAttr = false;
     var shouldImportBelongsTo = false;
     var shouldImportHasMany = false;
+    
+    console.log(JSON.stringify( options.entity.options ));
 
     for (var name in entityOptions) {
       var type = entityOptions[name] || '';
       var foreignModel = name;
       var inverseName = '';
+      var propertyUri = null;
+      if (type.indexOf('&' > -1)) {
+        [type, ...propertyUri] = type.split('&');
+        propertyUri = propertyUri.join("&");
+      }
       if (type.indexOf(':') > -1) {
         foreignModel = type.split(':')[1];
         type = type.split(':')[0];
@@ -86,10 +94,10 @@ module.exports = {
         needs.push('\'model:' + dasherizedForeignModelSingular + '\'');
       }
 
-
       properties.push({
         name: camelizedName,
         kind: type,
+        propertyUri: propertyUri,
         relType: dasherizedForeignModelSingular,
         relRoute: dasherizedForeignModelPlural
       });
@@ -100,9 +108,10 @@ module.exports = {
       return needs.indexOf(need) === i;
     });
 
-    if (shouldImportAttr) {
-      importStatements.push('import attr from \'ember-data/attr\';');
-    }
+    // We now always want this because of the URI
+    // if (shouldImportAttr) {
+    //   importStatements.push('import attr from \'ember-data/attr\';');
+    // }
 
     if (shouldImportBelongsTo && shouldImportHasMany) {
       importStatements.push('import { belongsTo, hasMany } from \'ember-data/relationships\';');
@@ -113,7 +122,7 @@ module.exports = {
     }
 
     importStatements = importStatements.join(EOL);
-    attrs = attrs.join(',' + EOL + '  ');
+    attrs = attrs.map( (attr) => `${attr},${EOL}` ).join('  ');
     needs = '  needs: [' + needsDeduplicated.join(', ') + ']';
 
     // Templates and code
@@ -144,9 +153,11 @@ module.exports = {
       relationships: relationships,
       belongsToRelationships: belongsToRelationships,
       hasManyRelationships: hasManyRelationships,
-      entityName: options.entity.name,
-      entitiesName: inflection.pluralize(options.entity.name),
-
+      properties: properties,
+      entityName: entityName,
+      entitiesName: inflection.pluralize(entityName),
+      entityClassUri: entityClassUri,
+      
       readonly: options.readonly
     };
 
@@ -157,6 +168,9 @@ module.exports = {
     return {
       __plural_name__: function(options) {
         return options.locals.entitiesName;
+      },
+      __singular_name__: function(option) {
+        return option.locals.entityName;
       }
     };
   },
@@ -166,7 +180,7 @@ module.exports = {
 
     var fileList = ['app/',
       'app/models/',
-      'app/models/__name__.js',
+      'app/models/__singular_name__.js',
       'app/routes/',
       'app/routes/__plural_name__/',
       'app/routes/__plural_name__/index.js',
@@ -258,28 +272,24 @@ function dsAttr(name, type, inverse) {
 
 function updateRouter(action, options) {
   var entity = options.entity;
+  var [ entityName ] = options.entity.name.split("&");
   var actionColorMap = {
     add: 'green',
     remove: 'red'
   };
   var color = actionColorMap[action] || 'gray';
 
-  var entitiesName = inflection.pluralize(entity.name);
+  var entitiesName = inflection.pluralize(entityName);
 
-  var routes = [{
-      name: entitiesName,
-      options: {}
-    },
-    {
-      name: entitiesName + '/show',
-      options: {
-        path: ':id'
-      }
-    }
+  var routes = [
+    { name: entitiesName,
+      options: { path: `/doc/${entitiesName}/` } },
+    { name: entitiesName + '/show',
+      options: { path: ':id' } }
   ];
   if (!options.readonly) {
-    routes = routes.concat([{
-        name: entitiesName + '/new',
+    routes = routes.concat([
+      { name: entitiesName + '/new',
         options: {}
       },
       {
@@ -287,8 +297,7 @@ function updateRouter(action, options) {
         options: {
           path: ':id/edit'
         }
-      }
-    ]);
+      }]);
   }
   var self = this;
   this.ui.writeLine('updating router');

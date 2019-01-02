@@ -14,7 +14,7 @@ module.exports = {
   beforeInstall: function() {
   },
 
-  afterInstall: function(options) {
-    return this.addAddonToProject("ember-cli-sass");
+  afterInstall: async function(options) {
+    await this.addAddonToProject("ember-cli-sass");
   }
 };

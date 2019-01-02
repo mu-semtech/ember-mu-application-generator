@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-mu-application-generator'
+  name: 'ember-mu-application-generator',
+  isDevelopingAddon(){ return true; }
 };

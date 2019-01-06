@@ -14,7 +14,6 @@ module.exports = {
   async afterInstall(options) {
     await this.addAddonToProject("@lblod/ember-vo-webuniversum");
     await this.addAddonToProject("@lblod/ember-vo-webuniversum-data-table");
-    await this.addAddonToProject("@lblod/ember-rdfa-helpers");
   }
 
 };

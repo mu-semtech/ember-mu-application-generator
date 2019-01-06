@@ -8,8 +8,8 @@
      sort=sort
      page=page
      size=size
-     as |t|}}
-    {{#t.content as |c|}}
+     as |table|}}
+    {{#table.content as |c|}}
       {{#c.header}}
         <%= attributes.map( (property) => {
         return `{{th-sortable field='${property.name}' currentSorting=sort label=(t '${property.name}')}}`
@@ -31,7 +31,7 @@
         <td>{{link-to (t 'Open') '<%= entitiesName %>.show' row}}</td>
         <td>{{link-to (t 'Edit') '<%= entitiesName %>.edit' row}}</td>
       {{/c.body}}
-    {{/t.content}}
+    {{/table.content}}
   {{/data-table}}
 
   <%= (readonly?'':`<div class="actions">{{#link-to "${entitiesName}.new" class="button" title=(t "Create new ${entityName}") tagName="button" }}{{t 'Create new ${entityName}'}}{{/link-to}}</div>`)%>

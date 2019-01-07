@@ -186,6 +186,7 @@ module.exports = {
       'app/routes/__plural_name__/index.js',
       'app/routes/__plural_name__/show.js',
       'app/routes/__plural_name__/show-error.js',
+      'app/controllers/__plural_name__/index.js',
       'app/templates/',
       'app/templates/__plural_name__/',
       'app/templates/__plural_name__/index.hbs',

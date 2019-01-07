@@ -21,15 +21,25 @@
         <th>{{!-- contains detail edit action --}}</th>
       {{/c.header}}
       {{#c.body as |row|}}
-        <%= attributes.map( (property) =>
-        `<td about={{row.uri}} typeof={{row.rdfaBindings.class}} property={{row.rdfaBindings.${property.name}}}>{{row.${property.name}}}</td>`).join('\n')
+        <%= attributes.map( (property) => {
+          if (property.kind == "language-string-set") {
+            return `<td about={{row.uri}} typeof={{row.rdfaBindings.class}}>
+              {{#each row.${property.name} as |langString|}}
+                <span property={{row.rdfaBindings.${property.name}}} lang="{{langString.language}}" content="{{langString.content}}">
+                  <span class="language-string-set__content">"{{langString.content}}"</span><span class="language-string-set__language">@{{langString.language}}</span>
+                </span>
+              {{/each}} </td>`;
+          } else {
+            return `<td about={{row.uri}} typeof={{row.rdfaBindings.class}} property={{row.rdfaBindings.${property.name}}}>{{row.${property.name}}}</td>`;
+          }
+        }).join('\n')
         %>
         <%= belongsToRelationships.map( (rel) =>
         `{{#with-rdfa-context tagName="td" model=row as |ctx|}}
            {{#ctx.get prop="${rel.name}" link-to="${rel.relRoute}.show" as |ctx val|}}{{val.stringRep}}{{/ctx.get}}
          {{/with-rdfa-context}}` ).join('\n') %>
         <td>{{link-to (t 'Open') '<%= entitiesName %>.show' row}}</td>
-        <td>{{link-to (t 'Edit') '<%= entitiesName %>.edit' row}}</td>
+        <%= readonly?'':`<td>{{link-to (t 'Edit') '${entitiesName}.edit' row}}</td>` %>
       {{/c.body}}
     {{/table.content}}
   {{/data-table}}

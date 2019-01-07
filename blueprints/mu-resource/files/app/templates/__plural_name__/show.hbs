@@ -7,9 +7,22 @@
         {{t (humanize '<%= entityName %> data')}}
         <dl>
           <%= attributes.map( function(property) {
-          return `<dt class="properties__label">{{t "${property.name}"}}</dt>
-          <dd class="properties__data">{{ctx.get prop="${property.name}"}}</dd>`
-          }).join("\n") %>
+            let topic = `<dt class="properties__label">{{t "${property.name}"}}</dt>`;
+            let content = '';
+            if (property.kind == "language-string-set") {
+              content=`<dd class="properties__data">
+                {{#each model.${property.name} as |langString|}}
+                  <span property={{model.rdfaBindings.${property.name}}} lang="{{langString.language}}" content="{{langString.content}}">
+                    <span class="language-string-set__content">"{{langString.content}}"</span><span class="language-string-set__language">@{{langString.language}}</span>
+                  </span>
+                {{/each}}
+              </dd>`;
+            } else {
+              content=`<dd class="properties__data">{{ctx.get prop="${property.name}"}}</dd>`;
+            }
+            return `${topic} ${content}`;
+              }).join('\n')
+          %>
           <%= belongsToRelationships.map( function(rel) {
           return `<dt class="properties__label">{{t "${rel.name}"}}</dt>
           <dd class="properties__data">{{#ctx.get prop="${rel.name}" link-to="${rel.relRoute}.show" as |ctx val|}}{{val.stringRep}}{{/ctx.get}}</dd>`

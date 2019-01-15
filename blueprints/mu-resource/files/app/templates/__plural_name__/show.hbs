@@ -6,6 +6,8 @@
       <div class="properties__title">
         {{t (humanize '<%= entityName %> data')}}
         <dl>
+          <dt class="properties__label">URI</dt>
+          <dd class="properties__data">{{#link-to "<%= entitiesName %>.show" model href=model.uri}}{{model.uri}}{{/link-to}}</dd>
           <%= attributes.map( function(property) {
             let topic = `<dt class="properties__label">{{t "${property.name}"}}</dt>`;
             let content = '';

@@ -30,7 +30,7 @@
                   </span>
                 {{/each}} {{/with-rdfa-context}}`;
                 } else {
-                return `{{#with-rdfa-context tagName="td" model=row as |ctx|}}{{ctx.get prop=${property.name}}}{{/with-rdfa-context}}`;
+                return `{{#with-rdfa-context tagName="td" model=row as |ctx|}}{{ctx.get prop="${property.name}"}}{{/with-rdfa-context}}`;
                 }
                 }).join('\n')
                 %>

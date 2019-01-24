@@ -43,7 +43,7 @@ module.exports = {
     var shouldImportAttr = false;
     var shouldImportBelongsTo = false;
     var shouldImportHasMany = false;
-    
+
     console.log(JSON.stringify( options.entity.options ));
 
     for (var name in entityOptions) {
@@ -157,7 +157,7 @@ module.exports = {
       entityName: entityName,
       entitiesName: inflection.pluralize(entityName),
       entityClassUri: entityClassUri,
-      
+
       readonly: options.readonly
     };
 
@@ -246,7 +246,8 @@ module.exports = {
 // TODO inline this function. the caller already does the type matching...
 function dsAttr(name, type, inverse) {
   if (inverse) { // is either empty or needs some more syntax
-    inverse = ", { inverse: '" + inverse + "' }";
+    // inverse = ", { inverse: '" + inverse + "' }";
+    inverse = ", { inverse: null }"; // TODO fix when 1-to-many relations are fixed in Ember Data
   }
   else {
     inverse = ", { inverse: null }";

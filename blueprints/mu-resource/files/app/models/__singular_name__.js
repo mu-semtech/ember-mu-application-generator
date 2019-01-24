@@ -8,7 +8,7 @@ export default Model.extend({
 
   uri: attr(),
   <%= attrs %>
-  rdfaBindings: {
+  rdfaBindings: Object.freeze({
     <%= entityClassUri ? `class: "${entityClassUri}",`:"" %>
     <%= properties.map( (property) => {
       if( property.propertyUri ) {
@@ -17,5 +17,5 @@ export default Model.extend({
         return false;
       }
     }).filter( (x) => x ).join(",\n    ") %>
-  }
+  })
 });

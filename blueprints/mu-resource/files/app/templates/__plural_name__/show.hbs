@@ -35,6 +35,7 @@
             {{#ctx.each prop="${rel.name}" useUri=true link-to="${rel.relRoute}.show" as |ctx val|}}
               {{val.stringRep}}
             {{/ctx.each}}
+            <span class="properties__data__limit">{{t "Displaying a limited list"}}</span>
           </dd>`
           }).join('\n') %>
         </dl>
